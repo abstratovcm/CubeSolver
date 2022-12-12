@@ -12,14 +12,13 @@ public:
 
     void Init()
     {
-        faces.resize(6, vector<int>(6, 0));
+        faces.resize(6, vector<int>(5, 0));
         for (int i = 0; i < 6; i++)
         {
-            for (int j = 1; j < 6; j++)
+            for (int j = 0; j < 5; j++)
             {
-                faces[i][j] = j + i * 6;
+                faces[i][j] = j + i * 5;
             }
-            faces[i][0] = i;
         }
     }
 
@@ -29,7 +28,7 @@ public:
              << "Skweb:" << endl;
         for (int i = 0; i < 6; i++)
         {
-            for (int j = 0; j < 6; j++)
+            for (int j = 0; j < 5; j++)
             {
                 cout << faces[i][j] << " ";
             }
@@ -40,13 +39,13 @@ public:
     void Move(const string move)
     {
         if (move.compare("NL") == 0)
-            UpdateGears({1, 2, 5}, {4, 3, 0}, {2, 5, 4});
+            UpdateGears({1, 2, 5}, {4, 3, 0}, {1, 4, 3});
         else if (move.compare("NO") == 0)
-            UpdateGears({1, 2, 4}, {5, 3, 0}, {5, 2, 1});
+            UpdateGears({1, 2, 4}, {5, 3, 0}, {4, 1, 0});
         else if (move.compare("SL") == 0)
-            UpdateGears({1, 5, 0}, {2, 3, 4}, {4, 2, 1});
+            UpdateGears({1, 5, 0}, {2, 3, 4}, {3, 1, 0});
         else if (move.compare("SO") == 0)
-            UpdateGears({1, 4, 0}, {2, 3, 5}, {1, 5, 4});
+            UpdateGears({1, 4, 0}, {2, 3, 5}, {0, 4, 3});
     }
     void UpdateGears(vector<int> colors1, vector<int> colors2, vector<int> peaces)
     {
@@ -67,10 +66,10 @@ public:
         faces[colors2[2]][peaces[2]] = aux2[0];
         faces[colors2[2]][peaces[0]] = aux2[1];
 
-        aux2[2] = faces[colors2[0]][3];
-        faces[colors2[0]][3] = faces[colors2[1]][3];
-        faces[colors2[1]][3] = faces[colors2[2]][3];
-        faces[colors2[2]][3] = aux2[2];
+        aux2[2] = faces[colors2[0]][2];
+        faces[colors2[0]][2] = faces[colors2[1]][2];
+        faces[colors2[1]][2] = faces[colors2[2]][2];
+        faces[colors2[2]][2] = aux2[2];
 
         int corner = FindCorner(peaces);
         int cornerAux = faces[colors2[0]][corner];
@@ -83,20 +82,18 @@ public:
     {
         for (int i = 0; i < 6; i++)
         {
-            for (int j = 1; j < 6; j++)
+            for (int j = 0; j < 5; j++)
             {
-                if (faces[i][j] != j + i * 6)
+                if (faces[i][j] != j + i * 5)
                     return false;
             }
-            if (faces[i][0] != i)
-                return false;
         }
         return true;
     }
     int FindCorner(vector<int> peaces)
     {
         vector<int> colorAux(4);
-        colorAux = {1, 2, 4, 5};
+        colorAux = {0, 1, 3, 4};
         int countAux = 0;
 
         for (int i = 0; i < 4; i++)
@@ -109,7 +106,7 @@ public:
             else
                 countAux = 0;
         }
-        cerr << "ERROR: CORNER" << endl;
+        cerr << "ERROR: CORNER NOT FOUND" << endl;
         return 0;
     }
     void Scramble(int number)
@@ -129,39 +126,45 @@ public:
                 Move("SL");
         }
     }
-    bool Solve (int number, const string move) {
+    bool Solve(int number, const string move)
+    {
         Move(move);
-        if (IsSolved()) {
+        if (IsSolved())
+        {
             Move(move);
             Move(move);
             return true;
         }
         number++;
-        if (number >= 20) 
+        if (number >= 20)
         {
             Move(move);
             Move(move);
             return false;
         }
-        if (Solve(number, "NL")) {
+        if (Solve(number, "NL"))
+        {
             cout << "NL" << endl;
             Move(move);
             Move(move);
             return true;
         }
-        else if (Solve(number, "NO")) {
+        else if (Solve(number, "NO"))
+        {
             cout << "NO" << endl;
             Move(move);
             Move(move);
             return true;
         }
-        else if (Solve(number, "SO")) {
+        else if (Solve(number, "SO"))
+        {
             cout << "NO" << endl;
             Move(move);
             Move(move);
             return true;
         }
-        else if (Solve(number, "SL")) {
+        else if (Solve(number, "SL"))
+        {
             cout << "NO" << endl;
             Move(move);
             Move(move);
@@ -170,6 +173,5 @@ public:
         Move(move);
         Move(move);
         return false;
-
     }
 };
