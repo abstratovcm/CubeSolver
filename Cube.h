@@ -73,23 +73,30 @@ public:
     {
         if (type.compare("skewb") == 0)
         {
-            moves.Set("NL", {{1, 2, 5}, {4, 3, 0}}, {{1, 4, 3}, {0}, {2}});
-            moves.Set("NO", {{1, 2, 4}, {5, 3, 0}}, {{4, 1, 0}, {2}, {3}});
-            moves.Set("SL", {{1, 5, 0}, {2, 3, 4}}, {{3, 1, 0}, {2}, {4}});
-            moves.Set("SO", {{1, 4, 0}, {2, 3, 5}}, {{0, 4, 3}, {1}, {2}});
+            moves.SetSkewbMove("NL", {1, 2, 5}, {4, 3, 0}, {1, 4, 3});
+            moves.SetSkewbMove("NO", {1, 2, 4}, {5, 3, 0}, {4, 1, 0});
+            moves.SetSkewbMove("SL", {1, 5, 0}, {2, 3, 4}, {3, 1, 0});
+            moves.SetSkewbMove("SO", {1, 4, 0}, {2, 3, 5}, {0, 4, 3});
         }
     }
 
-    void Move(const string move)
+    void Move(const string name)
     {
-        if (move.compare("NL") == 0)
-            UpdateGears({1, 2, 5}, {4, 3, 0}, {1, 4, 3});
-        else if (move.compare("NO") == 0)
-            UpdateGears({1, 2, 4}, {5, 3, 0}, {4, 1, 0});
-        else if (move.compare("SL") == 0)
-            UpdateGears({1, 5, 0}, {2, 3, 4}, {3, 1, 0});
-        else if (move.compare("SO") == 0)
-            UpdateGears({1, 4, 0}, {2, 3, 5}, {0, 4, 3});
+        if (moves.Find(name))
+        {
+            int aux, MAX;
+            vector<vector<vector<int>>> *m = &moves.Get(name);
+            for (int i = 0; i < (*m).size(); i++)
+            {
+                MAX = (*m)[i].size() - 1;
+                aux = faces[(*m)[i][0][0]][(*m)[i][0][1]];
+                for (int j = 0; j < (*m)[i].size() - 1; j++)
+                {
+                    faces[(*m)[i][j][0]][(*m)[i][j][1]] = faces[(*m)[i][j + 1][0]][(*m)[i][j + 1][1]];
+                }
+                faces[(*m)[i][MAX][0]][(*m)[i][MAX][1]] = aux;
+            }
+        }
     }
 
     void MoveSequence(vector<string> moves)
@@ -100,57 +107,14 @@ public:
         }
     }
 
-    void UpdateGears(vector<int> colors1, vector<int> colors2, vector<int> peaces)
+    bool Find(const string name)
     {
-        int aux1;
-        aux1 = faces[colors1[0]][peaces[0]];
-        faces[colors1[0]][peaces[0]] = faces[colors1[1]][peaces[1]];
-        faces[colors1[1]][peaces[1]] = faces[colors1[2]][peaces[2]];
-        faces[colors1[2]][peaces[2]] = aux1;
-
-        vector<int> aux2(3);
-        for (int i = 0; i < 2; i++)
-            aux2[i] = faces[colors2[0]][peaces[i]];
-
-        faces[colors2[0]][peaces[0]] = faces[colors2[1]][peaces[1]];
-        faces[colors2[0]][peaces[1]] = faces[colors2[1]][peaces[2]];
-        faces[colors2[1]][peaces[1]] = faces[colors2[2]][peaces[2]];
-        faces[colors2[1]][peaces[2]] = faces[colors2[2]][peaces[0]];
-        faces[colors2[2]][peaces[2]] = aux2[0];
-        faces[colors2[2]][peaces[0]] = aux2[1];
-
-        aux2[2] = faces[colors2[0]][2];
-        faces[colors2[0]][2] = faces[colors2[1]][2];
-        faces[colors2[1]][2] = faces[colors2[2]][2];
-        faces[colors2[2]][2] = aux2[2];
-
-        int corner = FindCorner(peaces);
-        int cornerAux = faces[colors2[0]][corner];
-        faces[colors2[0]][corner] = faces[colors2[1]][corner];
-        faces[colors2[1]][corner] = faces[colors2[2]][corner];
-        faces[colors2[2]][corner] = cornerAux;
+        if (moves.Find(name))
+            return true;
+        else
+            return false;
     }
 
-    int FindCorner(vector<int> peaces)
-    {
-        vector<int> colorAux(4);
-        colorAux = {0, 1, 3, 4};
-        int countAux = 0;
-
-        for (int i = 0; i < 4; i++)
-        {
-            for (int j = 0; j < 3; j++)
-                if (colorAux[i] != peaces[j])
-                    countAux++;
-            if (countAux == 3)
-                return colorAux[i];
-            else
-                countAux = 0;
-        }
-
-        cerr << "ERROR: CORNER NOT FOUND" << endl;
-        return 0;
-    }
     void Scramble(int number)
     {
         int moveAux;
