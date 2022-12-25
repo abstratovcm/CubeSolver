@@ -13,59 +13,41 @@ class Cube
 
 private:
     Moves moves;
-    vector<vector<int>> faces;
+    vector<int> position;
 
 public:
     Cube(const string type)
     {
         if (type.compare("skewb") == 0)
-            resizeCube(6, 5);
+            ResizeCube(30);
         DefineMoves(type);
     }
 
-    void resizeCube(int rows, int cols)
+    void ResizeCube(int size)
     {
-        if (rows < 1)
-            cerr << "ERROR: wrong number of rows to cube representation.";
-        if (cols < 1)
-            cerr << "ERROR: wrong number of columns to cube representation.";
+        if (size < 1)
+            throw("ERROR: (Cube::ResizeCube) wrong size");
 
-        faces.resize(rows, vector<int>(cols, 0));
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < cols; j++)
-                faces[i][j] = j + i * cols;
+        position.resize(size);
+        for (int i = 0; i < size; i++)
+            position[i] = i;
     }
 
     void Print()
     {
-        int rows = faces.size();
-        int cols = faces[0].size();
         cout << endl;
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < position.size(); i++)
         {
-            for (int j = 0; j < cols; j++)
-            {
-                if (faces[i][j] < 10)
-                    cout << " " << faces[i][j] << " ";
-                else
-                    cout << faces[i][j] << " ";
-            }
-            cout << endl;
+            cout << position[i] << " ";
         }
+        cout << endl;
     }
 
     bool IsSolved()
     {
-        int rows = faces.size();
-        int cols = faces[0].size();
-        for (int i = 0; i < rows; i++)
-        {
-            for (int j = 0; j < cols; j++)
-            {
-                if (faces[i][j] != j + i * cols)
-                    return false;
-            }
-        }
+        for (int i = 0; i < position.size(); i++)
+            if (position[i] != i)
+                return false;
         return true;
     }
 
@@ -73,10 +55,10 @@ public:
     {
         if (type.compare("skewb") == 0)
         {
-            moves.SetSkewbMove("NL", {1, 2, 5}, {4, 3, 0}, {1, 4, 3});
-            moves.SetSkewbMove("NO", {1, 2, 4}, {5, 3, 0}, {4, 1, 0});
-            moves.SetSkewbMove("SL", {1, 5, 0}, {2, 3, 4}, {3, 1, 0});
-            moves.SetSkewbMove("SO", {1, 4, 0}, {2, 3, 5}, {0, 4, 3});
+            moves.Set("NL", {{20, 15, 0}, {24, 18, 1}, {22, 17, 2}, {21, 19, 3}, {14, 28, 6}}, 30);
+            moves.Set("NO", {{29, 16, 0}, {27, 17, 2}, {28, 18, 3}, {26, 15, 4}, {11, 20, 9}}, 30);
+            moves.Set("SL", {{8, 26, 0}, {15, 23, 11}, {17, 22, 12}, {16, 20, 13}, {19, 24, 14}}, 30);
+            moves.Set("SO", {{5, 24, 3}, {19, 28, 10}, {16, 26, 11}, {17, 27, 12}, {18, 25, 14}}, 30);
         }
     }
 
@@ -84,18 +66,9 @@ public:
     {
         if (moves.Find(name))
         {
-            int aux, MAX;
-            vector<vector<vector<int>>> *m = &moves.Get(name);
-            for (int i = 0; i < (*m).size(); i++)
-            {
-                MAX = (*m)[i].size() - 1;
-                aux = faces[(*m)[i][0][0]][(*m)[i][0][1]];
-                for (int j = 0; j < (*m)[i].size() - 1; j++)
-                {
-                    faces[(*m)[i][j][0]][(*m)[i][j][1]] = faces[(*m)[i][j + 1][0]][(*m)[i][j + 1][1]];
-                }
-                faces[(*m)[i][MAX][0]][(*m)[i][MAX][1]] = aux;
-            }
+            vector<int> *m = &moves.Get(name);
+            for (int i = 0; i < position.size(); i++)
+                position[i] = (*m)[position[i]];
         }
     }
 
@@ -169,7 +142,6 @@ public:
 
     bool Solve(int number, const string move, vector<string> &moveSolution)
     {
-
         Move(move);
         if (IsSolved())
         {
@@ -215,38 +187,5 @@ public:
         Move(move);
         Move(move);
         return false;
-    }
-    void Compare()
-    {
-        int rows = faces.size();
-        int cols = faces[0].size();
-        vector<vector<int>> binaryMatrix(rows, vector<int>(cols, 0));
-        cout << endl;
-        for (int i = 0; i < rows; i++)
-        {
-            for (int j = 0; j < cols; j++)
-            {
-                if (faces[i][j] == j + i * cols)
-                    cout << " 0 ";
-                else
-                {
-                    cout << " 1 ";
-                    binaryMatrix[i][j] = 1;
-                }
-            }
-            cout << "| " << accumulate(binaryMatrix[i].begin(), binaryMatrix[i].end(), 0) << " " << endl;
-        }
-        cout << " -  -  -  -  - " << endl;
-        int sumCol = 0;
-        for (int j = 0; j < cols; j++)
-        {
-            for (int i = 0; i < rows; i++)
-            {
-                sumCol += binaryMatrix[i][j];
-            }
-            cout << " " << sumCol << " ";
-            sumCol = 0;
-        }
-        cout << endl;
     }
 };
