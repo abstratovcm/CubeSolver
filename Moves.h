@@ -10,41 +10,96 @@ class Moves
 private:
     struct move
     {
-        vector<vector<vector<int>>> perm;
-        void Print()
+        vector<int> instructions;
+        void PrintCycles()
         {
-            string firstLine = "";
-            string secondLine = "";
-            for (int i = 0; i < perm.size(); i++)
+            int size = instructions.size(), value;
+            vector<int> seen(size, -1);
+            cout << endl;
+            for (int i = 0; i < size; i++)
             {
-                for (int j = 0; j < perm[i].size(); j++)
+                if (instructions[i] == i)
                 {
-                    for (int k = 0; k < perm[i][j].size(); k++)
+                    seen[i] = i;
+                    continue;
+                }
+                if (seen[i] != i)
+                {
+                    value = instructions[i];
+                    seen[i] = i;
+                    cout << "(" << value;
+                    while (true)
                     {
-                        if (k == 0)
-                            firstLine = firstLine + to_string(perm[i][j][k]);
-                        else if (k == 1)
-                            secondLine = secondLine + to_string(perm[i][j][k]);
+                        value = instructions[value];
+                        seen[value] = value;
+                        if (value == instructions[i])
+                        {
+                            cout << ")";
+                            break;
+                        }
+                        cout << " " << value;
                     }
                 }
-                firstLine += " ";
-                secondLine += " ";
             }
             cout << endl;
-            cout << firstLine << endl;
-            cout << secondLine << endl;
         }
 
-        void Set(vector<vector<vector<int>>> moves)
+        void Print()
         {
-            perm.resize(moves.size());
-            for (int i = 0; i < perm.size(); i++)
+            cout << endl;
+            string line1 = "";
+            string line2 = "";
+            int aux = 1, count = 1, MAX = 2;
+            while (true)
             {
-                perm[i].resize(moves[i].size());
-                for (int j = 0; j < perm[i].size(); j++)
+                if (instructions.size() < 10 * aux)
+                {
+                    aux = 1;
+                    break;
+                }
+                aux *= 10;
+                MAX += 1;
+            }
 
-                    for (int k = 0; k < moves[i][j].size(); k++)
-                        perm[i][j].push_back(moves[i][j][k]);
+            for (int i = 0; i < instructions.size(); i++)
+            {
+                while (true)
+                {
+                    if (i < 10 * aux)
+                    {
+                        line1.append(string(MAX - count, ' ') + to_string(i));
+                        count = 1;
+                        aux = 1;
+                        break;
+                    }
+                    count++;
+                    aux *= 10;
+                }
+                while (true)
+                {
+                    if (instructions[i] < 10 * aux)
+                    {
+                        line2.append(string(MAX - count, ' ') + to_string(instructions[i]));
+                        count = 1;
+                        aux = 1;
+                        break;
+                    }
+                    count++;
+                    aux *= 10;
+                }
+            }
+            cout << line1 << endl;
+            cout << line2 << endl;
+        }
+
+        void Set(vector<int> moves)
+        {
+            instructions.resize(moves.size());
+            for (int i = 0; i < moves.size(); i++)
+            {
+                if (moves[i] >= moves.size())
+                    throw("ERROR: (Moves::move.Set) it isn't a permutation");
+                instructions[i] = moves[i];
             }
         }
     };
@@ -52,46 +107,63 @@ private:
     unordered_map<string, move> movesTable;
 
 public:
-    void Set(const string name, vector<vector<vector<int>>> permutations)
+    void Set(const string name, vector<int> permutation)
     {
         if (Find(name))
             throw("ERROR: (Moves::Set) name found");
         move m;
-        m.Set(permutations);
+        m.Set(permutation);
         movesTable.insert({name, m});
     }
 
-    void SetSkewbMove(const string name, vector<int> colors,
-                      vector<int> otherColors, vector<int> pieces)
+    void Set(const string name, vector<vector<int>> cycles, int size = -1)
     {
         if (Find(name))
-            throw("ERROR: (Moves::SetSkewbMove) name found");
-        vector<vector<vector<int>>> finalMatrix;
-        vector<int> allColors = {0, 1, 2, 3, 4, 5};
-        vector<int> allPieces = {0, 1, 2, 3, 4};
-        vector<int> otherPieces;
-
-        MoveHelper::CombineColorPiece(colors, pieces, finalMatrix);
-        MoveHelper::CombineColorPiece(otherColors, pieces, finalMatrix);
-
-        rotate(pieces.rbegin(), pieces.rbegin() + 2, pieces.rend());
-        MoveHelper::CombineColorPiece(otherColors, pieces, finalMatrix);
-
-        sort(pieces.begin(), pieces.end());
-        set_difference(allPieces.begin(), allPieces.end(), pieces.begin(), pieces.end(),
-                       inserter(otherPieces, otherPieces.begin()));
-        for (int i = 0; i < otherPieces.size(); i++)
-            MoveHelper::CombineColorPiece(otherColors, {otherPieces[i]}, finalMatrix);
+            throw("ERROR: (Moves::Set) name found");
 
         move m;
-        m.Set(finalMatrix);
+
+        int MAX = 0, previousMAX = 0;
+        vector<int> permutation;
+        if (size > -1)
+        {
+            MAX = size;
+            permutation.resize(MAX);
+            for (int k = previousMAX; k < MAX; k++)
+                permutation[k] = k;
+        }
+
+        for (int i = 0; i < cycles.size(); i++)
+        {
+            for (int j = 0; j < cycles[i].size(); j++)
+            {
+                if (cycles[i][j] >= MAX)
+                {
+                    previousMAX = MAX;
+                    MAX = cycles[i][j] + 1;
+                    permutation.resize(MAX);
+                    for (int k = previousMAX; k < MAX; k++)
+                        permutation[k] = k;
+                }
+                if (j == cycles[i].size() - 1)
+                {
+                    permutation[cycles[i][j]] = cycles[i][0];
+                }
+                else
+                {
+                    permutation[cycles[i][j]] = cycles[i][j + 1];
+                }
+            }
+        }
+
+        m.Set(permutation);
         movesTable.insert({name, m});
     }
 
-    vector<vector<vector<int>>> &Get(const string name)
+    vector<int> &Get(const string name)
     {
         if (Find(name))
-            return movesTable[name].perm;
+            return movesTable[name].instructions;
         throw "ERROR: (Moves::Get) name not found";
     }
 
@@ -102,11 +174,32 @@ public:
         return false;
     }
 
-    void Print(const string name)
+    void Print(const string name, bool showCycles = false)
     {
         if (Find(name))
-            movesTable[name].Print();
+        {
+            if (showCycles == false)
+                movesTable[name].Print();
+            else
+                movesTable[name].PrintCycles();
+        }
+
         else
             throw "ERROR: (Moves::Print) name not found";
+    }
+
+    void Compose(const string name1, const string name2)
+    {
+        if (Find(name1) && Find(name2))
+        {
+            if (movesTable[name1].instructions.size() != movesTable[name2].instructions.size())
+                throw("ERROR: (Moves::Compose) different size for permutations");
+            move m;
+            m.instructions.resize(movesTable[name1].instructions.size());
+            for (int i = 0; i < m.instructions.size(); i++)
+                m.instructions[i] = movesTable[name2].instructions[movesTable[name1].instructions[i]];
+
+            movesTable.insert({name1 + " " + name2, m});
+        }
     }
 };
