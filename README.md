@@ -28,7 +28,7 @@ make all
 To run the program, execute the following command in the terminal:
 
 ```bash
-./Debug
+./bin/Debug
 ```
 This will launch the CubeSolver program, and you will be able to move the cube by pressing keys on your keyboard.
 
