@@ -32,8 +32,8 @@ To run the program, execute the following command in the terminal:
 ```
 This will launch the CubeSolver program, and you will be able to move the cube by pressing keys on your keyboard.
 
-## Keyboard Controls
-CubeSolver allows you to manipulate the Rubik's Cube using the following keys:
+## Keyboard and Mouse Controls
+CubeSolver allows you to manipulate the Rubik's Cube using the following controls:
 
 - `U`: rotate the upper layer clockwise
 - `u`: rotate the upper layer counter-clockwise
@@ -48,6 +48,13 @@ CubeSolver allows you to manipulate the Rubik's Cube using the following keys:
 - `B`: rotate the back layer clockwise
 - `b`: rotate the back layer counter-clockwise
 - `1`: return the cube to its original form
+- Up arrow: pitch the camera up
+- Down arrow: pitch the camera down
+- Left arrow: yaw the camera to the left
+- Right arrow: yaw the camera to the right
+- Left mouse button: Click and hold to rotate the cube by moving the mouse horizontally and vertically.
+
+
 
 ## Cleaning up
 To clean up any generated files, run the following command:
