@@ -19,6 +19,9 @@ int main(int argc, char **argv)
     glutDisplayFunc(display);
     glutSpecialFunc(specialKeys);
     glutKeyboardFunc(normalKeys);
+    glutMouseFunc(mouse);
+    glutMotionFunc(motion);
+    glutPassiveMotionFunc(passiveMotion);
 
     // Enable depth testing to correctly display the 3D cube
     glEnable(GL_DEPTH_TEST);

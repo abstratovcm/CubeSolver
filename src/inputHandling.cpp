@@ -2,14 +2,22 @@
 
 void specialKeys(int key, int x, int y)
 {
-    if (key == GLUT_KEY_RIGHT)
-        moveSide(0, 1);
-    else if (key == GLUT_KEY_LEFT)
-        moveSide(1, 1);
-    else if (key == GLUT_KEY_UP)
-        moveSide(2, 1);
-    else if (key == GLUT_KEY_DOWN)
-        moveSide(3, 1);
+
+    switch (key)
+    {
+    case GLUT_KEY_UP:
+        cameraPitch -= 4.0f;
+        break;
+    case GLUT_KEY_DOWN:
+        cameraPitch += 4.0f;
+        break;
+    case GLUT_KEY_LEFT:
+        cameraYaw -= 4.0f;
+        break;
+    case GLUT_KEY_RIGHT:
+        cameraYaw += 4.0f;
+        break;
+    }
     glutPostRedisplay();
 }
 
@@ -68,5 +76,41 @@ void normalKeys(unsigned char key, int x, int y)
         moveSide(BOTTOM, -1);
     }
 
+    glutPostRedisplay();
+}
+
+void mouse(int button, int state, int x, int y)
+{
+    if (button == GLUT_LEFT_BUTTON)
+    {
+        if (state == GLUT_DOWN)
+        {
+            mouseDown = true;
+        }
+        else
+        {
+            mouseDown = false;
+        }
+    }
+}
+
+void motion(int x, int y)
+{
+
+    if (mouseDown)
+    {
+        cameraYaw += (lastMouseX - x) * 0.5f;
+        cameraPitch += (lastMouseY - y) * 0.5f;
+    }
+    lastMouseX = x;
+    lastMouseY = y;
+    text = std::to_string(x) + " " + std::to_string(y);
+    glutPostRedisplay();
+}
+
+void passiveMotion(int x, int y) {
+    lastMouseX = x;
+    lastMouseY = y;
+    text = std::to_string(x) + " " + std::to_string(y);
     glutPostRedisplay();
 }

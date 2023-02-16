@@ -15,4 +15,8 @@ void drawCube(const Cube &cube);
 
 void drawCubes();
 
+void drawText();
+
+void updateCamera();
+
 #endif
