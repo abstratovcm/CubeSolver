@@ -21,7 +21,7 @@ void display()
 
     glPopMatrix();
 
-    drawText();
+    //drawText();
 
     glutSwapBuffers();
 }
