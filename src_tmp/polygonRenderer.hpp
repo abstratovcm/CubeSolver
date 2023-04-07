@@ -5,6 +5,7 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
+#include "renderData.hpp"
 
 class PolygonRenderer
 {
@@ -13,9 +14,7 @@ public:
     ~PolygonRenderer();
 
     void init();
-    void render(const std::vector<glm::vec2> &vertices,
-                const glm::mat4 &modelMatrix,
-                const glm::vec3 &color);
+    void render(const RenderData data);
     void cleanup();
 
 private:

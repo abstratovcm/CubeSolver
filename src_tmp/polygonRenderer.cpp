@@ -73,9 +73,7 @@ void PolygonRenderer::init()
     glDeleteShader(fragmentShader);
 }
 
-void PolygonRenderer::render(const std::vector<glm::vec2> &vertices,
-                                    const glm::mat4 &modelMatrix,
-                                    const glm::vec3 &color)
+void PolygonRenderer::render(const RenderData data)
 {
 
     // Create the Vertex Array Object and Vertex Buffer Object
@@ -87,7 +85,7 @@ void PolygonRenderer::render(const std::vector<glm::vec2> &vertices,
 
     // Bind and fill the Vertex Buffer Object
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec2), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, data.vertices.size() * sizeof(glm::vec2), data.vertices.data(), GL_STATIC_DRAW);
 
     // Set vertex attribute pointers
     glEnableVertexAttribArray(0);
@@ -101,11 +99,11 @@ void PolygonRenderer::render(const std::vector<glm::vec2> &vertices,
     GLuint viewLoc = glGetUniformLocation(shaderProgram, "view");
     GLuint projectionLoc = glGetUniformLocation(shaderProgram, "projection");
 
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(data.modelMatrix));
 
     // Set the color uniform
     GLuint colorLoc = glGetUniformLocation(shaderProgram, "color");
-    glUniform3fv(colorLoc, 1, glm::value_ptr(color));
+    glUniform3fv(colorLoc, 1, glm::value_ptr(data.color));
 
     // Set the view and projection matrices as identity matrices for simplicity
     glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -114,7 +112,7 @@ void PolygonRenderer::render(const std::vector<glm::vec2> &vertices,
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
     // Draw the regular polygon
-    glDrawArrays(GL_TRIANGLE_FAN, 0, vertices.size());
+    glDrawArrays(GL_TRIANGLE_FAN, 0, data.vertices.size());
 
     // Cleanup
     glBindBuffer(GL_ARRAY_BUFFER, 0);

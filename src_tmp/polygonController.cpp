@@ -26,8 +26,8 @@ PolygonController::PolygonController() : window(nullptr), renderer()
     glfwSetWindowUserPointer(window, this); // Store 'this' pointer for use in the static keyCallback
 
     // Add initial polygons
-    addPolygon(3, 1.0f, glm::vec3(-1.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f));
-    addPolygon(6, 1.0f, glm::vec3(1.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+    addRegularPolygon(3, 1.0f, glm::vec3(-1.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f));
+    addRegularPolygon(6, 1.0f, glm::vec3(1.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f));
 }
 
 PolygonController::~PolygonController()
@@ -42,6 +42,7 @@ void PolygonController::run()
 
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
+    glm::vec3 rotation = glm::vec3(50.0f, 30.0f, 10.0f);
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -55,13 +56,11 @@ void PolygonController::run()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Render all the regular polygons
-        for (auto &polygon : polygons)
+        for (size_t i=0; i<repository.getSize(); i++)
         {
-            polygon->updateRotation(glm::vec3(50.0f, 30.0f, 10.0f) * deltaTime);
-            std::vector<glm::vec2> vertices = polygon->getVertices();
-            glm::mat4 modelMatrix = polygon->getModelMatrix();
-            glm::vec3 color = polygon->getColor();
-            renderer.render(vertices, modelMatrix, color);
+            repository.UpdateRotationByIndex(i, rotation, deltaTime);
+            RenderData data = repository.getRenderData(i);
+            renderer.render(data);
         }
 
         // Swap front and back buffers
@@ -96,15 +95,11 @@ void PolygonController::handleKeyPress(int key)
         glm::vec3 position = glm::vec3(-2.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 4.0f)), -2.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 4.0f)), -2.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 4.0f)));
         glm::vec3 rotation = glm::vec3(static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 360.0f)), static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 360.0f)), static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 360.0f)));
         glm::vec3 color = glm::vec3(static_cast<float>(rand()) / static_cast<float>(RAND_MAX), static_cast<float>(rand()) / static_cast<float>(RAND_MAX), static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
-        addPolygon(numVertices, radius, position, rotation, color);
+        addRegularPolygon(numVertices, radius, position, rotation, color);
     }
 }
 
-void PolygonController::addPolygon(unsigned int numVertices, float radius, const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &color)
+void PolygonController::addRegularPolygon(unsigned int numVertices, float radius, const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &color)
 {
-    polygons.emplace_back(std::make_unique<RegularPolygon>(numVertices, radius));
-    std::unique_ptr<Polygon>& polygon = polygons.back();
-    polygon->setPosition(position);
-    polygon->setRotation(rotation);
-    polygon->setColor(color);
+    repository.addRegularPolygon(numVertices, radius, position, rotation, color);
 }

@@ -1,7 +1,9 @@
 #pragma once
 
 #include "polygonRenderer.hpp"
-#include "regularPolygon.hpp"
+#include "polygon.hpp"
+#include "polygonRepository.hpp"
+#include "renderData.hpp"
 #include <vector>
 #include <memory>
 
@@ -16,9 +18,9 @@ public:
 private:
     GLFWwindow *window;
     PolygonRenderer renderer;
-    std::vector<std::unique_ptr<Polygon>> polygons;
+    PolygonRepository repository;
 
     static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
     void handleKeyPress(int key);
-    void addPolygon(unsigned int numVertices, float radius, const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &color);
+    void addRegularPolygon(unsigned int numVertices, float radius, const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &color);
 };

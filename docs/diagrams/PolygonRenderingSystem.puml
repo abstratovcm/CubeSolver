@@ -1,0 +1,51 @@
+@startuml PolygonRenderingSystem
+
+skinparam Shadowing true
+
+skinparam backgroundColor #F0F0F0
+
+skinparam nodesep 50
+
+skinparam class {
+  BackgroundColor #C9D1D9
+  BorderColor #0D1117
+  FontColor #0D1117
+  FontStyle bold
+  StereotypeFontColor #1F6FEB
+}
+
+skinparam Arrow {
+  Color #1F6FEB
+  FontColor #0D1117
+  FontStyle bold
+  Thickness 2
+}
+
+class Polygon {
+}
+
+class PolygonController {
+}
+
+class PolygonRenderer {
+}
+
+class PolygonRepository {
+}
+
+struct RenderData {
+  {field} <color:#0D1117>modelMatrix:</color> <color:#1F6FEB>glm::mat4</color>
+  {field} <color:#0D1117>color:</color> <color:#1F6FEB>glm::vec3</color>
+  {field} <color:#0D1117>vertices:</color> <color:#1F6FEB>std::vector<glm::vec2></color>
+}
+
+PolygonController "1" -down- "1" PolygonRenderer : uses >
+PolygonController "1" -right- "1" PolygonRepository : uses >
+PolygonRepository "1" -up- "0..*" Polygon : manages >
+PolygonRenderer .right.> RenderData
+PolygonRepository .down.> RenderData
+PolygonController ..> RenderData
+
+hide empty members
+
+@enduml

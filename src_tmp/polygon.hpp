@@ -8,18 +8,16 @@
 class Polygon
 {
 public:
+    Polygon(std::vector<glm::vec2> vertices);
     Polygon();
     virtual ~Polygon() = default;
 
-    // Abstract function to calculate the area of the 2D object
-    virtual float getArea() const = 0;
-
     // Setters
-    void setPosition(const glm::vec3 &pos);
-    void setRotation(const glm::vec3 &rot);
-    void setScale(const glm::vec2 &scl);
-    void setColor(const glm::vec3 &col);
-    void setVertices(const std::vector<glm::vec2> &ver);
+    void setPosition(const glm::vec3 &position);
+    void setRotation(const glm::vec3 &rotation);
+    void setScale(const glm::vec2 &scale);
+    void setColor(const glm::vec3 &color);
+    void setVertices(const std::vector<glm::vec2> &vertices);
 
     // Getters
     glm::vec3 getPosition() const;
@@ -27,6 +25,7 @@ public:
     glm::vec2 getScale() const;
     const glm::vec3 &getColor() const;
     const std::vector<glm::vec2> &getVertices() const;
+    const std::size_t getSize() const;
 
     // Get the model matrix
     glm::mat4 getModelMatrix() const;
