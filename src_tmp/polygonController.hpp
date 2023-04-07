@@ -1,7 +1,7 @@
 #pragma once
 
 #include "polygonRenderer.hpp"
-#include "regularPolygon.cpp"
+#include "regularPolygon.hpp"
 #include <vector>
 #include <memory>
 

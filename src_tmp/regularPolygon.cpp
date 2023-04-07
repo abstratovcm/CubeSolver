@@ -1,31 +1,23 @@
-#include "polygon.cpp"
+#include "regularPolygon.hpp"
 
-class RegularPolygon : public Polygon
+RegularPolygon::RegularPolygon(unsigned int numVertices_, float radius) : numVertices(numVertices_), radius(radius)
 {
-public:
-    RegularPolygon(unsigned int numVertices_, float radius) : numVertices(numVertices_), radius(radius)
+    float angle = 2 * glm::pi<float>() / numVertices;
+    for (unsigned int i = 0; i < numVertices; ++i)
     {
-        float angle = 2 * glm::pi<float>() / numVertices;
-        for (unsigned int i = 0; i < numVertices; ++i)
-        {
-            vertices.push_back(radius * glm::vec2(cos(i * angle), sin(i * angle)));
-        }
+        vertices.push_back(radius * glm::vec2(cos(i * angle), sin(i * angle)));
     }
+}
 
-    float getArea() const override
-    {
-        return 0.5f * numVertices * radius * radius * glm::sin(2 * glm::pi<float>() / numVertices);
-    }
+float RegularPolygon::getArea() const
+{
+    return 0.5f * numVertices * radius * radius * glm::sin(2 * glm::pi<float>() / numVertices);
+}
 
-    // Setters
-    void setNumVertices(unsigned int vertices) { numVertices = vertices; }
-    void setRadius(float r) { radius = r; }
+// Setters
+void RegularPolygon::setNumVertices(unsigned int vertices) { numVertices = vertices; }
+void RegularPolygon::setRadius(float r) { radius = r; }
 
-    // Getters
-    unsigned int getNumVertices() const { return numVertices; }
-    float getRadius() const { return radius; }
-
-private:
-    unsigned int numVertices;
-    float radius;
-};
+// Getters
+unsigned int RegularPolygon::getNumVertices() const { return numVertices; }
+float RegularPolygon::getRadius() const { return radius; }
