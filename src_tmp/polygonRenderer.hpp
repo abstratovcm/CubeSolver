@@ -6,11 +6,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 
-class RegularPolygonRenderer
+class PolygonRenderer
 {
 public:
-    RegularPolygonRenderer();
-    ~RegularPolygonRenderer();
+    PolygonRenderer();
+    ~PolygonRenderer();
 
     void init();
     void render(const std::vector<glm::vec2> &vertices,

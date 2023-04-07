@@ -1,21 +1,21 @@
 #pragma once
 
-#include "regularPolygonRenderer.hpp"
+#include "polygonRenderer.hpp"
 #include "regularPolygon.cpp"
 #include <vector>
 #include <memory>
 
-class RegularPolygonController
+class PolygonController
 {
 public:
-    RegularPolygonController();
-    ~RegularPolygonController();
+    PolygonController();
+    ~PolygonController();
 
     void run();
 
 private:
     GLFWwindow *window;
-    RegularPolygonRenderer renderer;
+    PolygonRenderer renderer;
     std::vector<std::unique_ptr<Polygon>> polygons;
 
     static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);

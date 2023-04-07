@@ -1,4 +1,4 @@
-#include "regularPolygonRenderer.hpp"
+#include "polygonRenderer.hpp"
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -35,15 +35,14 @@ void main() {
     color = vec4(fragmentColor, 1.0);
 }
 )";
+PolygonRenderer::PolygonRenderer() : vao(0), vbo(0), shaderProgram(0) {}
 
-RegularPolygonRenderer::RegularPolygonRenderer() : vao(0), vbo(0), shaderProgram(0) {}
-
-RegularPolygonRenderer::~RegularPolygonRenderer()
+PolygonRenderer::~PolygonRenderer()
 {
     cleanup();
 }
 
-void RegularPolygonRenderer::init()
+void PolygonRenderer::init()
 {
     // Initialize GLEW
     GLenum err = glewInit();
@@ -74,7 +73,7 @@ void RegularPolygonRenderer::init()
     glDeleteShader(fragmentShader);
 }
 
-void RegularPolygonRenderer::render(const std::vector<glm::vec2> &vertices,
+void PolygonRenderer::render(const std::vector<glm::vec2> &vertices,
                                     const glm::mat4 &modelMatrix,
                                     const glm::vec3 &color)
 {
@@ -123,7 +122,7 @@ void RegularPolygonRenderer::render(const std::vector<glm::vec2> &vertices,
     glUseProgram(0);
 }
 
-void RegularPolygonRenderer::cleanup()
+void PolygonRenderer::cleanup()
 {
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);

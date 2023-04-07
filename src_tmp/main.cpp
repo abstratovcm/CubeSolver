@@ -1,7 +1,7 @@
-#include "regularPolygonController.hpp"
+#include "polygonController.hpp"
 
 int main() {
-    RegularPolygonController controller;
+    PolygonController controller;
     controller.run();
 
     return 0;

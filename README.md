@@ -2,7 +2,7 @@
 
 CubeSolver is an OpenGL-based project that draws a Rubik's Cube and allows it to be manipulated by the user using keyboard inputs. The cube can be rotated and twisted just like a real Rubik's Cube.
 
-![3D Rubik's Cube](./images/cube01.png)
+![3D Rubik's Cube](./docs/images/cube01.png)
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
@@ -58,9 +58,9 @@ CubeSolver allows you to manipulate the Rubik's Cube using the following control
 
 ## Screenshots
 
-![3D Rubik's Cube](./images/cube02.png)
+![3D Rubik's Cube](./docs/images/cube02.png)
 
-![3D Rubik's Cube](./images/cube03.png)
+![3D Rubik's Cube](./docs/images/cube03.png)
 
 ## Cleaning up
 To clean up any generated files, run the following command:

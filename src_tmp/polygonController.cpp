@@ -1,6 +1,6 @@
-#include "regularPolygonController.hpp"
+#include "polygonController.hpp"
 
-RegularPolygonController::RegularPolygonController() : window(nullptr), renderer()
+PolygonController::PolygonController() : window(nullptr), renderer()
 {
     // Initialize GLFW
     if (!glfwInit())
@@ -30,13 +30,13 @@ RegularPolygonController::RegularPolygonController() : window(nullptr), renderer
     addPolygon(6, 1.0f, glm::vec3(1.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f));
 }
 
-RegularPolygonController::~RegularPolygonController()
+PolygonController::~PolygonController()
 {
     glfwDestroyWindow(window);
     glfwTerminate();
 }
 
-void RegularPolygonController::run()
+void PolygonController::run()
 {
     renderer.init();
 
@@ -74,16 +74,16 @@ void RegularPolygonController::run()
     renderer.cleanup();
 }
 
-void RegularPolygonController::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
+void PolygonController::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
     if (action == GLFW_PRESS)
     {
-        RegularPolygonController *controller = static_cast<RegularPolygonController *>(glfwGetWindowUserPointer(window));
+        PolygonController *controller = static_cast<PolygonController *>(glfwGetWindowUserPointer(window));
         controller->handleKeyPress(key);
     }
 }
 
-void RegularPolygonController::handleKeyPress(int key)
+void PolygonController::handleKeyPress(int key)
 {
     if (key == GLFW_KEY_ESCAPE)
     {
@@ -100,7 +100,7 @@ void RegularPolygonController::handleKeyPress(int key)
     }
 }
 
-void RegularPolygonController::addPolygon(unsigned int numVertices, float radius, const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &color)
+void PolygonController::addPolygon(unsigned int numVertices, float radius, const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &color)
 {
     polygons.emplace_back(std::make_unique<RegularPolygon>(numVertices, radius));
     std::unique_ptr<Polygon>& polygon = polygons.back();
