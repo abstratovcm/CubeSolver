@@ -1,0 +1,15 @@
+@startuml polygon
+
+class RegularPolygon {
+}
+
+class RegularPolygonRenderer {
+}
+
+class RegularPolygonController {
+}
+
+RegularPolygonController "1" -down- "1" RegularPolygonRenderer : uses >
+RegularPolygonController "1" -up- "0..*" RegularPolygon : manages >
+
+@enduml

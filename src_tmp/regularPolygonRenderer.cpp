@@ -4,39 +4,51 @@
 #include <glm/gtc/type_ptr.hpp>
 
 // Define the vertex shader source
-const char* vertexShaderSource = R"(
+const char *vertexShaderSource = R"(
 #version 330 core
-layout(location = 0) in vec2 position;
+
+layout (location = 0) in vec2 position;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform vec3 color;
+
+out vec3 fragmentColor;
 
 void main() {
     gl_Position = projection * view * model * vec4(position, 0.0, 1.0);
+    fragmentColor = color;
 }
+
 )";
 
 // Define the fragment shader source
-const char* fragmentShaderSource = R"(
+const char *fragmentShaderSource = R"(
 #version 330 core
-out vec4 fragColor;
+
+in vec3 fragmentColor;
+
+out vec4 color;
 
 void main() {
-    fragColor = vec4(1.0, 0.5, 0.0, 1.0);
+    color = vec4(fragmentColor, 1.0);
 }
 )";
 
 RegularPolygonRenderer::RegularPolygonRenderer() : vao(0), vbo(0), shaderProgram(0) {}
 
-RegularPolygonRenderer::~RegularPolygonRenderer() {
+RegularPolygonRenderer::~RegularPolygonRenderer()
+{
     cleanup();
 }
 
-void RegularPolygonRenderer::init() {
+void RegularPolygonRenderer::init()
+{
     // Initialize GLEW
     GLenum err = glewInit();
-    if (err != GLEW_OK) {
+    if (err != GLEW_OK)
+    {
         std::cerr << "Error initializing GLEW: " << glewGetErrorString(err) << std::endl;
         exit(1);
     }
@@ -62,13 +74,10 @@ void RegularPolygonRenderer::init() {
     glDeleteShader(fragmentShader);
 }
 
-void RegularPolygonRenderer::render(const RegularPolygon& polygon) {
-    // Generate vertex data for the regular polygon
-    std::vector<glm::vec2> vertices;
-    float angle = 2 * glm::pi<float>() / polygon.getNumVertices();
-    for (unsigned int i = 0; i < polygon.getNumVertices(); ++i) {
-        vertices.push_back(polygon.getRadius() * glm::vec2(cos(i * angle), sin(i * angle)));
-    }
+void RegularPolygonRenderer::render(const std::vector<glm::vec2> &vertices,
+                                    const glm::mat4 &modelMatrix,
+                                    const glm::vec3 &color)
+{
 
     // Create the Vertex Array Object and Vertex Buffer Object
     glGenVertexArrays(1, &vao);
@@ -77,13 +86,13 @@ void RegularPolygonRenderer::render(const RegularPolygon& polygon) {
     // Bind the Vertex Array Object
     glBindVertexArray(vao);
 
-        // Bind and fill the Vertex Buffer Object
+    // Bind and fill the Vertex Buffer Object
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec2), vertices.data(), GL_STATIC_DRAW);
 
     // Set vertex attribute pointers
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void*)0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (void *)0);
 
     // Use the shader program
     glUseProgram(shaderProgram);
@@ -93,11 +102,15 @@ void RegularPolygonRenderer::render(const RegularPolygon& polygon) {
     GLuint viewLoc = glGetUniformLocation(shaderProgram, "view");
     GLuint projectionLoc = glGetUniformLocation(shaderProgram, "projection");
 
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(polygon.getModelMatrix()));
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+    // Set the color uniform
+    GLuint colorLoc = glGetUniformLocation(shaderProgram, "color");
+    glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
     // Set the view and projection matrices as identity matrices for simplicity
-    glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 projection = glm::mat4(1.0f);
+    glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 10.0f);
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
@@ -110,7 +123,8 @@ void RegularPolygonRenderer::render(const RegularPolygon& polygon) {
     glUseProgram(0);
 }
 
-void RegularPolygonRenderer::cleanup() {
+void RegularPolygonRenderer::cleanup()
+{
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
     glDeleteProgram(shaderProgram);

@@ -2,15 +2,20 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "regularPolygon.cpp"
+#include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
+#include <vector>
 
-class RegularPolygonRenderer {
+class RegularPolygonRenderer
+{
 public:
     RegularPolygonRenderer();
     ~RegularPolygonRenderer();
 
     void init();
-    void render(const RegularPolygon& polygon);
+    void render(const std::vector<glm::vec2> &vertices,
+                const glm::mat4 &modelMatrix,
+                const glm::vec3 &color);
     void cleanup();
 
 private:

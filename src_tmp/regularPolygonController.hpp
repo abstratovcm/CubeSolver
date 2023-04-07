@@ -1,8 +1,12 @@
 #pragma once
 
 #include "regularPolygonRenderer.hpp"
+#include "regularPolygon.cpp"
+#include <vector>
+#include <memory>
 
-class RegularPolygonController {
+class RegularPolygonController
+{
 public:
     RegularPolygonController();
     ~RegularPolygonController();
@@ -10,10 +14,11 @@ public:
     void run();
 
 private:
-    GLFWwindow* window;
+    GLFWwindow *window;
     RegularPolygonRenderer renderer;
-    RegularPolygon polygon;
+    std::vector<std::unique_ptr<Polygon>> polygons;
 
-    static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
     void handleKeyPress(int key);
+    void addPolygon(unsigned int numVertices, float radius, const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &color);
 };
