@@ -15,6 +15,12 @@ public:
                                 const glm::vec3 &planeNormal,
                                 const glm::mat4 &modelMatrix,
                                 const std::vector<glm::vec2> &vertices);
+    static bool isBetweenPlanes(const glm::mat4 &modelMatrix,
+                                const std::vector<glm::vec2> &vertices,
+                                const glm::vec3 &planePoint1,
+                                const glm::vec3 &planeNormal1,
+                                const glm::vec3 &planePoint2,
+                                const glm::vec3 &planeNormal2);
     static glm::vec3 getVertex3DPosition(const glm::mat4 &modelMatrix,
                                          const glm::vec2 &originalVertex);
 };

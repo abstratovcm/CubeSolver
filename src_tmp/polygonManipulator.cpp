@@ -81,6 +81,79 @@ bool PolygonIntersector::intersectsPlane(const glm::vec3 &planePoint,
     return false; // The polygon does not intersect the plane
 }
 
+bool PolygonIntersector::isBetweenPlanes(const glm::mat4 &modelMatrix,
+                                         const std::vector<glm::vec2> &vertices,
+                                         const glm::vec3 &planePoint1,
+                                         const glm::vec3 &planeNormal1,
+                                         const glm::vec3 &planePoint2,
+                                         const glm::vec3 &planeNormal2)
+{
+    int abovePlane1 = 0;
+    int belowPlane1 = 0;
+    int abovePlane2 = 0;
+    int belowPlane2 = 0;
+
+    for (size_t i = 0; i < vertices.size(); ++i)
+    {
+        glm::vec3 v = getVertex3DPosition(modelMatrix, vertices[i]);
+        float distanceToPlane1 = glm::dot(v - planePoint1, planeNormal1);
+        float distanceToPlane2 = glm::dot(v - planePoint2, planeNormal2);
+
+        if (distanceToPlane1 > 0.0f)
+        {
+            abovePlane1++;
+        }
+        else if (distanceToPlane1 < 0.0f)
+        {
+            belowPlane1++;
+        }
+        else
+        {
+            return true;
+        }
+
+        if (distanceToPlane2 > 0.0f)
+        {
+            abovePlane2++;
+        }
+        else if (distanceToPlane2 < 0.0f)
+        {
+            belowPlane2++;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    if (abovePlane1 > 0 && belowPlane1 > 0)
+    {
+        return true;
+    }
+
+    if (abovePlane2 > 0 && belowPlane2 > 0)
+    {
+        return true;
+    }
+
+    if ((abovePlane1 > 0 && belowPlane2 > 0) || (abovePlane2 > 0 && belowPlane1 > 0))
+    {
+        return true;
+    }
+
+    if (abovePlane1 == 0 && abovePlane2 == 0)
+    {
+        return false;
+    }
+
+    if (belowPlane1 == 0 && belowPlane2 == 0)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 glm::vec3 PolygonIntersector::getVertex3DPosition(const glm::mat4 &modelMatrix, const glm::vec2 &originalVertex)
 {
     glm::vec4 vertex4D(originalVertex, 0.0f, 1.0f);

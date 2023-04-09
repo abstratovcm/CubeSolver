@@ -63,8 +63,10 @@ void PolygonController::run()
         renderer.renderRay(rayOrigin, rayDirection);
 
         // Define a point on the plane and its normal
-        glm::vec3 planePoint(0.0f, 0.0f, 0.0f);
-        glm::vec3 planeNormal(1.0f, 0.0f, 1.0f);
+        glm::vec3 planePoint1(0.0f, 0.0f, 0.0f);
+        glm::vec3 planeNormal1(1.0f, 0.0f, 1.0f);
+        glm::vec3 planePoint2(-0.5f, 0.0f, -0.5f);
+        glm::vec3 planeNormal2(1.0f, 0.0f, 1.0f);
 
         // Render all the regular polygons
         for (size_t i = 0; i < repository.getSize(); i++)
@@ -79,10 +81,12 @@ void PolygonController::run()
             {
                 data.color = glm::vec3(1.0f);
             }
-            if (PolygonIntersector::intersectsPlane(planePoint,
-                                                    planeNormal,
-                                                    data.modelMatrix,
-                                                    data.vertices))
+            if (PolygonIntersector::isBetweenPlanes(data.modelMatrix,
+                                                    data.vertices,
+                                                    planePoint1,
+                                                    planeNormal1,
+                                                    planePoint2,
+                                                    planeNormal2))
             {
                 data.color = glm::vec3(0.0f);
             }
@@ -90,7 +94,8 @@ void PolygonController::run()
         }
 
         // Render the semi-transparent plane
-        renderer.renderPlane(planePoint, planeNormal);
+        renderer.renderPlane(planePoint2, planeNormal2);
+        renderer.renderPlane(planePoint1, planeNormal1);
 
         // Swap front and back buffers
         glfwSwapBuffers(window);

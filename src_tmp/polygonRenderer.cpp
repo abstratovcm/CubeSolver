@@ -120,42 +120,26 @@ void PolygonRenderer::renderRay(const glm::vec3 &startPoint, const glm::vec3 &en
 
 void PolygonRenderer::renderPlane(const glm::vec3 &planePoint, const glm::vec3 &planeNormal)
 {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // Create a local coordinate system on the plane
-    glm::vec3 planeUp = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 planeRight;
-    if (glm::length(glm::cross(planeNormal, planeUp)) < 1e-6)
-    {
-        planeUp = glm::vec3(1.0f, 0.0f, 0.0f);
-    }
-    planeRight = glm::normalize(glm::cross(planeNormal, planeUp));
-    planeUp = glm::normalize(glm::cross(planeRight, planeNormal));
+    // Calculate tangent and bitangent vectors
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 tangent = glm::normalize(glm::cross(planeNormal, up));
+    glm::vec3 bitangent = glm::normalize(glm::cross(planeNormal, tangent));
 
-    // Create plane vertices
+    // Plane vertex data
     GLfloat planeVertices[] = {
-        // positions
-        planePoint.x - 0.5f * planeRight.x - 0.5f * planeUp.x,
-        planePoint.y - 0.5f * planeRight.y - 0.5f * planeUp.y,
-        planePoint.z - 0.5f * planeRight.z - 0.5f * planeUp.z,
+        -0.5f * tangent.x - 0.5f * bitangent.x + planePoint.x, -0.5f * tangent.y - 0.5f * bitangent.y + planePoint.y, -0.5f * tangent.z - 0.5f * bitangent.z + planePoint.z,
+        0.5f * tangent.x - 0.5f * bitangent.x + planePoint.x, 0.5f * tangent.y - 0.5f * bitangent.y + planePoint.y, 0.5f * tangent.z - 0.5f * bitangent.z + planePoint.z,
+        0.5f * tangent.x + 0.5f * bitangent.x + planePoint.x, 0.5f * tangent.y + 0.5f * bitangent.y + planePoint.y, 0.5f * tangent.z + 0.5f * bitangent.z + planePoint.z,
+        -0.5f * tangent.x + 0.5f * bitangent.x + planePoint.x, -0.5f * tangent.y + 0.5f * bitangent.y + planePoint.y, -0.5f * tangent.z + 0.5f * bitangent.z + planePoint.z};
 
-        planePoint.x + 0.5f * planeRight.x - 0.5f * planeUp.x,
-        planePoint.y + 0.5f * planeRight.y - 0.5f * planeUp.y,
-        planePoint.z + 0.5f * planeRight.z - 0.5f * planeUp.z,
-
-        planePoint.x + 0.5f * planeRight.x + 0.5f * planeUp.x,
-        planePoint.y + 0.5f * planeRight.y + 0.5f * planeUp.y,
-        planePoint.z + 0.5f * planeRight.z + 0.5f * planeUp.z,
-
-        planePoint.x - 0.5f * planeRight.x + 0.5f * planeUp.x,
-        planePoint.y - 0.5f * planeRight.y + 0.5f * planeUp.y,
-        planePoint.z - 0.5f * planeRight.z + 0.5f * planeUp.z};
-
-    // Plane indices
+    // Plane index data
     GLuint planeIndices[] = {
         0, 1, 2,
         2, 3, 0};
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Bind VAO
     glBindVertexArray(vao);
@@ -184,16 +168,16 @@ void PolygonRenderer::renderPlane(const glm::vec3 &planePoint, const glm::vec3 &
     glUniform4fv(planeColorLoc, 1, glm::value_ptr(planeColor));
 
     // Set model, view, and projection matrices
-    // (assuming you have model, view, and projection matrices already set up)
     GLint modelLoc = glGetUniformLocation(planeShaderProgram, "model");
     GLint viewLoc = glGetUniformLocation(planeShaderProgram, "view");
     GLint projLoc = glGetUniformLocation(planeShaderProgram, "projection");
-    // Set the model matrix
 
+    // Calculate the model matrix
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f)); // Scale the plane
     glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 10.0f);
+
+    // Set the model, view, and projection matrices
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
