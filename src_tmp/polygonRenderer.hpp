@@ -29,6 +29,7 @@ public:
 private:
     GLuint vao;
     GLuint vbo;
+    GLuint ebo;
     GLuint polygonShaderProgram;
     GLuint rayShaderProgram;
     GLuint planeShaderProgram;

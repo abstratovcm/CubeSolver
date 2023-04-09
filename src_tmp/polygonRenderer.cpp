@@ -20,6 +20,10 @@ void PolygonRenderer::init()
         exit(1);
     }
 
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
+
     createShaderProgram(polygonShaderProgram,
                         "./src_tmp/polygonVertexShader.glsl",
                         "./src_tmp/polygonFragmentShader.glsl");
@@ -37,10 +41,6 @@ void PolygonRenderer::renderPolygon(const glm::vec3 &color,
                                     const glm::mat4 &modelMatrix,
                                     const std::vector<glm::vec2> &vertices)
 {
-
-    // Create the Vertex Array Object and Vertex Buffer Object
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
 
     // Bind the Vertex Array Object
     glBindVertexArray(vao);
@@ -84,12 +84,10 @@ void PolygonRenderer::renderPolygon(const glm::vec3 &color,
 
 void PolygonRenderer::renderRay(const glm::vec3 &startPoint, const glm::vec3 &endPoint)
 {
-    // Create and bind the Vertex Array Object
-    glGenVertexArrays(1, &vao);
+    // Bind the Vertex Array Object
     glBindVertexArray(vao);
 
-    // Create and bind the Vertex Buffer Object
-    glGenBuffers(1, &vbo);
+    // Bind the Vertex Buffer Object
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     // Create an array with the start and end points of the line
@@ -159,21 +157,15 @@ void PolygonRenderer::renderPlane(const glm::vec3 &planePoint, const glm::vec3 &
         0, 1, 2,
         2, 3, 0};
 
-    // Create VAO and VBO
-    GLuint VAO, VBO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
     // Bind VAO
-    glBindVertexArray(VAO);
+    glBindVertexArray(vao);
 
     // Bind and set vertex buffer
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
 
     // Bind and set element buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(planeIndices), planeIndices, GL_STATIC_DRAW);
 
     // Configure vertex attributes
@@ -207,7 +199,7 @@ void PolygonRenderer::renderPlane(const glm::vec3 &planePoint, const glm::vec3 &
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
     // Render the semi-transparent plane
-    glBindVertexArray(VAO);
+    glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
@@ -219,6 +211,7 @@ void PolygonRenderer::cleanup()
 {
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &ebo);
     glDeleteProgram(polygonShaderProgram);
     glDeleteProgram(rayShaderProgram);
     glDeleteProgram(planeShaderProgram);
