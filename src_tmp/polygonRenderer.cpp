@@ -35,6 +35,32 @@ void main() {
     color = vec4(fragmentColor, 1.0);
 }
 )";
+
+// Define the line vertex shader source
+const char *lineVertexShaderSource = R"(
+#version 330 core
+
+layout (location = 0) in vec3 position;
+
+uniform mat4 view;
+uniform mat4 projection;
+
+void main() {
+    gl_Position = projection * view * vec4(position, 1.0);
+}
+)";
+
+// Define the line fragment shader source
+const char *lineFragmentShaderSource = R"(
+#version 330 core
+
+out vec4 color;
+
+void main() {
+    color = vec4(1.0, 0.0, 0.0, 1.0); // Set the line color (e.g., red)
+}
+)";
+
 PolygonRenderer::PolygonRenderer() : vao(0), vbo(0), shaderProgram(0) {}
 
 PolygonRenderer::~PolygonRenderer()
@@ -71,9 +97,31 @@ void PolygonRenderer::init()
     // Delete the shaders after linking
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
+
+    // Create and compile the line vertex shader
+    GLuint lineVertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(lineVertexShader, 1, &lineVertexShaderSource, NULL);
+    glCompileShader(lineVertexShader);
+
+    // Create and compile the line fragment shader
+    GLuint lineFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(lineFragmentShader, 1, &lineFragmentShaderSource, NULL);
+    glCompileShader(lineFragmentShader);
+
+    // Create and link the line shader program
+    lineShaderProgram = glCreateProgram();
+    glAttachShader(lineShaderProgram, lineVertexShader);
+    glAttachShader(lineShaderProgram, lineFragmentShader);
+    glLinkProgram(lineShaderProgram);
+
+    // Delete the line shaders after linking
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 }
 
-void PolygonRenderer::render(const RenderData data)
+void PolygonRenderer::render(const glm::vec3 &color,
+                             const glm::mat4 &modelMatrix,
+                             const std::vector<glm::vec2> &vertices)
 {
 
     // Create the Vertex Array Object and Vertex Buffer Object
@@ -85,7 +133,7 @@ void PolygonRenderer::render(const RenderData data)
 
     // Bind and fill the Vertex Buffer Object
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, data.vertices.size() * sizeof(glm::vec2), data.vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec2), vertices.data(), GL_STATIC_DRAW);
 
     // Set vertex attribute pointers
     glEnableVertexAttribArray(0);
@@ -99,11 +147,11 @@ void PolygonRenderer::render(const RenderData data)
     GLuint viewLoc = glGetUniformLocation(shaderProgram, "view");
     GLuint projectionLoc = glGetUniformLocation(shaderProgram, "projection");
 
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(data.modelMatrix));
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
     // Set the color uniform
     GLuint colorLoc = glGetUniformLocation(shaderProgram, "color");
-    glUniform3fv(colorLoc, 1, glm::value_ptr(data.color));
+    glUniform3fv(colorLoc, 1, glm::value_ptr(color));
 
     // Set the view and projection matrices as identity matrices for simplicity
     glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -112,7 +160,45 @@ void PolygonRenderer::render(const RenderData data)
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
     // Draw the regular polygon
-    glDrawArrays(GL_TRIANGLE_FAN, 0, data.vertices.size());
+    glDrawArrays(GL_TRIANGLE_FAN, 0, vertices.size());
+
+    // Cleanup
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+    glUseProgram(0);
+}
+
+void PolygonRenderer::renderLine(const glm::vec3 &startPoint, const glm::vec3 &endPoint)
+{
+    // Create and bind the Vertex Array Object
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    // Create and bind the Vertex Buffer Object
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    // Create an array with the start and end points of the line
+    glm::vec3 lineVertices[] = {startPoint, endPoint};
+    glBufferData(GL_ARRAY_BUFFER, sizeof(lineVertices), lineVertices, GL_STATIC_DRAW);
+
+    // Set the vertex attribute pointer
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+
+    // Use the shader program
+    glUseProgram(lineShaderProgram);
+
+    // Set the view and projection matrix uniforms
+    GLuint viewLoc = glGetUniformLocation(lineShaderProgram, "view");
+    GLuint projectionLoc = glGetUniformLocation(lineShaderProgram, "projection");
+    glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 10.0f);
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+    // Draw the line
+    glDrawArrays(GL_LINES, 0, 2);
 
     // Cleanup
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -125,4 +211,5 @@ void PolygonRenderer::cleanup()
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
     glDeleteProgram(shaderProgram);
+    glDeleteProgram(lineShaderProgram);
 }

@@ -5,7 +5,6 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
-#include "renderData.hpp"
 
 class PolygonRenderer
 {
@@ -14,11 +13,15 @@ public:
     ~PolygonRenderer();
 
     void init();
-    void render(const RenderData data);
+    void render(const glm::vec3 &color,
+                const glm::mat4 &modelMatrix,
+                const std::vector<glm::vec2> &vertices);
+    void renderLine(const glm::vec3 &startPoint, const glm::vec3 &endPoint);
     void cleanup();
 
 private:
     GLuint vao;
     GLuint vbo;
     GLuint shaderProgram;
+    GLuint lineShaderProgram;
 };

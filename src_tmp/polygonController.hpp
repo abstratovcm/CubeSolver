@@ -1,9 +1,9 @@
 #pragma once
 
 #include "polygonRenderer.hpp"
-#include "polygon.hpp"
 #include "polygonRepository.hpp"
 #include "renderData.hpp"
+#include "polygonManipulator.hpp"
 #include <vector>
 #include <memory>
 

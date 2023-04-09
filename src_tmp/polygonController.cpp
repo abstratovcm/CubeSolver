@@ -51,16 +51,32 @@ void PolygonController::run()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        // Enable depth testing
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+
         // Clear the screen
         glClearColor(0.0f, 0.0f, 0.4f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glm::vec3 rayOrigin(-100.0f, 0.0f, 0.0f);
+        glm::vec3 rayDirection(100.0f, 0.0f, 0.0f);
+        renderer.renderLine(rayOrigin, rayDirection);
 
         // Render all the regular polygons
-        for (size_t i=0; i<repository.getSize(); i++)
+        for (size_t i = 0; i < repository.getSize(); i++)
         {
             repository.UpdateRotationByIndex(i, rotation, deltaTime);
             RenderData data = repository.getRenderData(i);
-            renderer.render(data);
+            float t;
+            if (PolygonIntersector::intersectsRay(rayOrigin,
+                                                  rayDirection,
+                                                  data.modelMatrix,
+                                                  data.vertices))
+            {
+                data.color = glm::vec3(0.0f);
+            }
+            renderer.render(data.color, data.modelMatrix, data.vertices);
         }
 
         // Swap front and back buffers

@@ -21,17 +21,11 @@ skinparam Arrow {
   Thickness 2
 }
 
-class Polygon {
-}
-
-class PolygonController {
-}
-
-class PolygonRenderer {
-}
-
-class PolygonRepository {
-}
+class Polygon
+class PolygonController 
+class PolygonRenderer 
+class PolygonRepository 
+class PolygonManipulator 
 
 struct RenderData {
   {field} <color:#0D1117>modelMatrix:</color> <color:#1F6FEB>glm::mat4</color>
@@ -41,8 +35,8 @@ struct RenderData {
 
 PolygonController "1" -down- "1" PolygonRenderer : uses >
 PolygonController "1" -right- "1" PolygonRepository : uses >
+PolygonController .up.> PolygonManipulator
 PolygonRepository "1" -up- "0..*" Polygon : manages >
-PolygonRenderer .right.> RenderData
 PolygonRepository .down.> RenderData
 PolygonController ..> RenderData
 
