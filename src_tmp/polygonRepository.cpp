@@ -3,11 +3,11 @@
 PolygonRepository::PolygonRepository() = default;
 
 // Add a regular polygon to the repository
-void PolygonRepository::addRegularPolygon(unsigned int numVertices,
-                       float radius,
-                       const glm::vec3 &position,
-                       const glm::vec3 &rotation,
-                       const glm::vec3 &color)
+void PolygonRepository::addRegularPolygon(const unsigned int &numVertices,
+                                          const float &radius,
+                                          const glm::vec3 &position,
+                                          const glm::vec3 &rotation,
+                                          const glm::vec3 &color)
 {
     std::vector<glm::vec2> vertices;
     float angle = 2 * glm::pi<float>() / numVertices;
@@ -23,7 +23,7 @@ void PolygonRepository::addRegularPolygon(unsigned int numVertices,
 }
 
 // Remove a polygon from the repository by index
-void PolygonRepository::removePolygon(std::size_t index)
+void PolygonRepository::removePolygon(const std::size_t &index)
 {
     if (index < polygons.size())
     {
@@ -32,7 +32,7 @@ void PolygonRepository::removePolygon(std::size_t index)
 }
 
 // Get a polygon by index
-Polygon *PolygonRepository::getPolygon(std::size_t index) const
+Polygon *PolygonRepository::getPolygon(const std::size_t &index) const
 {
     if (index < polygons.size())
     {
@@ -53,8 +53,9 @@ void PolygonRepository::clear()
     polygons.clear();
 }
 
-RenderData PolygonRepository::getRenderData(size_t index) const {
-    auto& polygon = polygons[index];
+RenderData PolygonRepository::getRenderData(const size_t &index) const
+{
+    auto &polygon = polygons[index];
     RenderData data;
     data.modelMatrix = polygon->getModelMatrix();
     data.color = polygon->getColor();
@@ -62,7 +63,10 @@ RenderData PolygonRepository::getRenderData(size_t index) const {
     return data;
 }
 
-void PolygonRepository::UpdateRotationByIndex(size_t index, glm::vec3 rotation, float deltaTime) {
-    auto& polygon = polygons[index];
+void PolygonRepository::UpdateRotationByIndex(const size_t &index,
+                                              const glm::vec3 &rotation,
+                                              const float &deltaTime)
+{
+    auto &polygon = polygons[index];
     polygon->updateRotation(rotation * deltaTime);
 }

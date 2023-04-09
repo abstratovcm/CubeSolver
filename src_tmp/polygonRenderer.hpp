@@ -22,8 +22,8 @@ public:
     void cleanup();
     GLuint loadShader(const GLenum &shaderType, const std::string &filePath);
     void createShaderProgram(GLuint &shaderProgram,
-                     const std::string &vertexPath,
-                     const std::string &fragmentPath);
+                             const std::string &vertexPath,
+                             const std::string &fragmentPath);
     void renderPlane(const glm::vec3 &planePoint, const glm::vec3 &planeNormal);
 
 private:

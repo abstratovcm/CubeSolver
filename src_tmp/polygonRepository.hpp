@@ -12,18 +12,20 @@ public:
     PolygonRepository();
     virtual ~PolygonRepository() = default;
 
-    void addRegularPolygon(unsigned int numVertices,
-                           float radius,
+    void addRegularPolygon(const unsigned int &numVertices,
+                           const float &radius,
                            const glm::vec3 &position,
                            const glm::vec3 &rotation,
                            const glm::vec3 &color);
-    void removePolygon(std::size_t index);
-    Polygon *getPolygon(std::size_t index) const;
+    void removePolygon(const std::size_t &index);
+    Polygon *getPolygon(const std::size_t &index) const;
     float getTotalArea() const;
     std::size_t getSize() const;
     void clear();
-    RenderData getRenderData(size_t index) const;
-    void UpdateRotationByIndex(size_t index, glm::vec3 rotation, float deltaTime);
+    RenderData getRenderData(const size_t &index) const;
+    void UpdateRotationByIndex(const size_t &index,
+                               const glm::vec3 &rotation,
+                               const float &deltaTime);
 
 private:
     std::vector<std::unique_ptr<Polygon>> polygons;

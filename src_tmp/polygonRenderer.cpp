@@ -21,16 +21,16 @@ void PolygonRenderer::init()
     }
 
     createShaderProgram(polygonShaderProgram,
-                "./src_tmp/polygonVertexShader.glsl",
-                "./src_tmp/polygonFragmentShader.glsl");
+                        "./src_tmp/polygonVertexShader.glsl",
+                        "./src_tmp/polygonFragmentShader.glsl");
 
     createShaderProgram(rayShaderProgram,
-                "./src_tmp/rayVertexShader.glsl",
-                "./src_tmp/rayFragmentShader.glsl");
+                        "./src_tmp/rayVertexShader.glsl",
+                        "./src_tmp/rayFragmentShader.glsl");
 
     createShaderProgram(planeShaderProgram,
-                "./src_tmp/planeVertexShader.glsl",
-                "./src_tmp/planeFragmentShader.glsl");
+                        "./src_tmp/planeVertexShader.glsl",
+                        "./src_tmp/planeFragmentShader.glsl");
 }
 
 void PolygonRenderer::renderPolygon(const glm::vec3 &color,
@@ -260,8 +260,8 @@ GLuint PolygonRenderer::loadShader(const GLenum &shaderType, const std::string &
 }
 
 void PolygonRenderer::createShaderProgram(GLuint &shaderProgram,
-                                  const std::string &vertexPath,
-                                  const std::string &fragmentPath)
+                                          const std::string &vertexPath,
+                                          const std::string &fragmentPath)
 {
     // Load and compile shaders
     GLuint vertexShader = loadShader(GL_VERTEX_SHADER, vertexPath);

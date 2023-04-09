@@ -15,5 +15,6 @@ public:
                                 const glm::vec3 &planeNormal,
                                 const glm::mat4 &modelMatrix,
                                 const std::vector<glm::vec2> &vertices);
-    static glm::vec3 getVertex3DPosition(const glm::mat4 &modelMatrix, const glm::vec2 &originalVertex);
+    static glm::vec3 getVertex3DPosition(const glm::mat4 &modelMatrix,
+                                         const glm::vec2 &originalVertex);
 };
