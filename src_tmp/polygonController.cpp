@@ -26,8 +26,7 @@ PolygonController::PolygonController() : window(nullptr), renderer()
     glfwSetWindowUserPointer(window, this); // Store 'this' pointer for use in the static keyCallback
 
     // Add initial polygons
-    addRegularPolygon(3, 1.0f, glm::vec3(-1.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f));
-    addRegularPolygon(6, 1.0f, glm::vec3(1.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+    makeRubiksCube(1.f);
 }
 
 PolygonController::~PolygonController()
@@ -61,7 +60,11 @@ void PolygonController::run()
 
         glm::vec3 rayOrigin(-100.0f, 0.0f, 0.0f);
         glm::vec3 rayDirection(100.0f, 0.0f, 0.0f);
-        renderer.renderLine(rayOrigin, rayDirection);
+        renderer.renderRay(rayOrigin, rayDirection);
+
+        // Define a point on the plane and its normal
+        glm::vec3 planePoint(0.0f, 0.0f, 0.0f);
+        glm::vec3 planeNormal(1.0f, 0.0f, 1.0f);
 
         // Render all the regular polygons
         for (size_t i = 0; i < repository.getSize(); i++)
@@ -74,10 +77,20 @@ void PolygonController::run()
                                                   data.modelMatrix,
                                                   data.vertices))
             {
+                data.color = glm::vec3(1.0f);
+            }
+            if (PolygonIntersector::intersectsPlane(planePoint,
+                                                    planeNormal,
+                                                    data.modelMatrix,
+                                                    data.vertices))
+            {
                 data.color = glm::vec3(0.0f);
             }
-            renderer.render(data.color, data.modelMatrix, data.vertices);
+            renderer.renderPolygon(data.color, data.modelMatrix, data.vertices);
         }
+
+        // Render the semi-transparent plane
+        renderer.renderPlane(planePoint, planeNormal);
 
         // Swap front and back buffers
         glfwSwapBuffers(window);
@@ -118,4 +131,72 @@ void PolygonController::handleKeyPress(int key)
 void PolygonController::addRegularPolygon(unsigned int numVertices, float radius, const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &color)
 {
     repository.addRegularPolygon(numVertices, radius, position, rotation, color);
+}
+
+void PolygonController::makeRubiksCube(float cubeSize)
+{
+    float faceSize = cubeSize / 3.0f;
+    float halfCubeSize = cubeSize / 2.0f;
+    float halfFaceSize = faceSize / 2.0f;
+    glm::vec3 color;
+
+    for (int face = 0; face < 6; ++face)
+    {
+        for (int row = 0; row < 3; ++row)
+        {
+            for (int col = 0; col < 3; ++col)
+            {
+                glm::vec3 position;
+                glm::vec3 rotation;
+
+                switch (face)
+                {
+                case 0: // Front
+                    position = glm::vec3(col * faceSize - halfCubeSize + halfFaceSize,
+                                         row * faceSize - halfCubeSize + halfFaceSize,
+                                         halfCubeSize - halfFaceSize);
+                    rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+                    color = glm::vec3(1.0f, 0.0f, 0.0f); // Red
+                    break;
+                case 1: // Back
+                    position = glm::vec3(halfCubeSize - halfFaceSize - col * faceSize,
+                                         row * faceSize - halfCubeSize + halfFaceSize,
+                                         -halfCubeSize + halfFaceSize);
+                    rotation = glm::vec3(0.0f, 180.0f, 0.0f);
+                    color = glm::vec3(0.0f, 1.0f, 0.0f); // Green
+                    break;
+                case 2: // Left
+                    position = glm::vec3(-halfCubeSize + halfFaceSize,
+                                         row * faceSize - halfCubeSize + halfFaceSize,
+                                         col * faceSize - halfCubeSize + halfFaceSize);
+                    rotation = glm::vec3(0.0f, 90.0f, 0.0f);
+                    color = glm::vec3(0.0f, 0.0f, 1.0f); // Blue
+                    break;
+                case 3: // Right
+                    position = glm::vec3(halfCubeSize - halfFaceSize,
+                                         row * faceSize - halfCubeSize + halfFaceSize,
+                                         halfCubeSize - halfFaceSize - col * faceSize);
+                    rotation = glm::vec3(0.0f, -90.0f, 0.0f);
+                    color = glm::vec3(1.0f, 1.0f, 0.0f); // Yellow
+                    break;
+                case 4: // Top
+                    position = glm::vec3(col * faceSize - halfCubeSize + halfFaceSize,
+                                         halfCubeSize - halfFaceSize,
+                                         row * faceSize - halfCubeSize + halfFaceSize);
+                    rotation = glm::vec3(90.0f, 0.0f, 0.0f);
+                    color = glm::vec3(1.0f, 0.5f, 0.0f); // Orange
+                    break;
+                case 5: // Bottom
+                    position = glm::vec3(col * faceSize - halfCubeSize + halfFaceSize,
+                                         -halfCubeSize + halfFaceSize,
+                                         -row * faceSize + halfCubeSize - halfFaceSize);
+                    rotation = glm::vec3(-90.0f, 0.0f, 0.0f);
+                    color = glm::vec3(1.0f, 1.0f, 1.0f); // White
+                    break;
+                }
+
+                repository.addRegularPolygon(4, halfFaceSize, position, rotation, color);
+            }
+        }
+    }
 }

@@ -23,4 +23,5 @@ private:
     static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
     void handleKeyPress(int key);
     void addRegularPolygon(unsigned int numVertices, float radius, const glm::vec3 &position, const glm::vec3 &rotation, const glm::vec3 &color);
+    void makeRubiksCube(float cubeSize);
 };
