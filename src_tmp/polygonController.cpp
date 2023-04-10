@@ -60,7 +60,7 @@ void PolygonController::run()
 
         glm::vec3 rayOrigin(-100.0f, 0.0f, 0.0f);
         glm::vec3 rayDirection(100.0f, 0.0f, 0.0f);
-        renderer.renderRay(rayOrigin, rayDirection);
+        // renderer.renderRay(rayOrigin, rayDirection);
 
         // Define a point on the plane and its normal
         glm::vec3 planePoint1(0.0f, 0.0f, 0.0f);
@@ -71,31 +71,31 @@ void PolygonController::run()
         // Render all the regular polygons
         for (size_t i = 0; i < repository.getSize(); i++)
         {
-            repository.UpdateRotationByIndex(i, rotation, deltaTime);
+            // repository.UpdateRotationByIndex(i, rotation, deltaTime);
             RenderData data = repository.getRenderData(i);
             float t;
-            if (PolygonIntersector::intersectsRay(rayOrigin,
-                                                  rayDirection,
-                                                  data.modelMatrix,
-                                                  data.vertices))
-            {
-                data.color = glm::vec3(1.0f);
-            }
-            if (PolygonIntersector::isBetweenPlanes(data.modelMatrix,
-                                                    data.vertices,
-                                                    planePoint1,
-                                                    planeNormal1,
-                                                    planePoint2,
-                                                    planeNormal2))
-            {
-                data.color = glm::vec3(0.0f);
-            }
+            // if (PolygonIntersector::intersectsRay(rayOrigin,
+            //                                       rayDirection,
+            //                                       data.modelMatrix,
+            //                                       data.vertices))
+            //{
+            //     data.color = glm::vec3(1.0f);
+            // }
+            // if (PolygonIntersector::isBetweenPlanes(data.modelMatrix,
+            //                                         data.vertices,
+            //                                         planePoint1,
+            //                                         planeNormal1,
+            //                                         planePoint2,
+            //                                         planeNormal2))
+            //{
+            //     data.color = glm::vec3(0.0f);
+            // }
             renderer.renderPolygon(data.color, data.modelMatrix, data.vertices);
         }
 
         // Render the semi-transparent plane
-        renderer.renderPlane(planePoint2, planeNormal2);
-        renderer.renderPlane(planePoint1, planeNormal1);
+        // renderer.renderPlane(planePoint2, planeNormal2);
+        // renderer.renderPlane(planePoint1, planeNormal1);
 
         // Swap front and back buffers
         glfwSwapBuffers(window);
@@ -138,70 +138,43 @@ void PolygonController::addRegularPolygon(unsigned int numVertices, float radius
     repository.addRegularPolygon(numVertices, radius, position, rotation, color);
 }
 
-void PolygonController::makeRubiksCube(float cubeSize)
+void PolygonController::makeRubiksCube(float sideLength)
 {
-    float faceSize = cubeSize / 3.0f;
-    float halfCubeSize = cubeSize / 2.0f;
-    float halfFaceSize = faceSize / 2.0f;
-    glm::vec3 color;
 
-    for (int face = 0; face < 6; ++face)
+    // Define the colors of a Rubik's Cube
+    std::vector<glm::vec3> colors = {
+        glm::vec3(1.0f, 0.0f, 0.0f),  // Red
+        glm::vec3(0.5f, 0.0f, 0.0f),  // Red
+        glm::vec3(0.0f, 1.0f, 0.0f),  // Green
+        glm::vec3(0.0f, 0.5f, 0.0f),  // Green
+        glm::vec3(0.0f, 0.0f, 1.0f),  // Blue
+        glm::vec3(0.0f, 0.0f, 0.5f),  // Blue
+        glm::vec3(1.0f, 1.0f, 0.0f),  // Yellow
+        glm::vec3(0.5f, 0.5f, 0.0f),  // Yellow
+        glm::vec3(1.0f, 0.5f, 0.0f),  // Orange
+        glm::vec3(0.5f, 0.25f, 0.0f), // Orange
+        glm::vec3(1.0f, 1.0f, 1.0f),  // White
+        glm::vec3(0.5f, 0.5f, 0.5f)   // White
+    };
+    float cubeSize = .5f;
+    float sideOffset = 2 * cubeSize;
+    glm::vec3 position;
+    for (int i = 0; i < 3; i++)
     {
-        for (int row = 0; row < 3; ++row)
+        for (int j = 0; j < 3; j++)
         {
-            for (int col = 0; col < 3; ++col)
-            {
-                glm::vec3 position;
-                glm::vec3 rotation;
-
-                switch (face)
-                {
-                case 0: // Front
-                    position = glm::vec3(col * faceSize - halfCubeSize + halfFaceSize,
-                                         row * faceSize - halfCubeSize + halfFaceSize,
-                                         halfCubeSize - halfFaceSize);
-                    rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-                    color = glm::vec3(1.0f, 0.0f, 0.0f); // Red
-                    break;
-                case 1: // Back
-                    position = glm::vec3(halfCubeSize - halfFaceSize - col * faceSize,
-                                         row * faceSize - halfCubeSize + halfFaceSize,
-                                         -halfCubeSize + halfFaceSize);
-                    rotation = glm::vec3(0.0f, 180.0f, 0.0f);
-                    color = glm::vec3(0.0f, 1.0f, 0.0f); // Green
-                    break;
-                case 2: // Left
-                    position = glm::vec3(-halfCubeSize + halfFaceSize,
-                                         row * faceSize - halfCubeSize + halfFaceSize,
-                                         col * faceSize - halfCubeSize + halfFaceSize);
-                    rotation = glm::vec3(0.0f, 90.0f, 0.0f);
-                    color = glm::vec3(0.0f, 0.0f, 1.0f); // Blue
-                    break;
-                case 3: // Right
-                    position = glm::vec3(halfCubeSize - halfFaceSize,
-                                         row * faceSize - halfCubeSize + halfFaceSize,
-                                         halfCubeSize - halfFaceSize - col * faceSize);
-                    rotation = glm::vec3(0.0f, -90.0f, 0.0f);
-                    color = glm::vec3(1.0f, 1.0f, 0.0f); // Yellow
-                    break;
-                case 4: // Top
-                    position = glm::vec3(col * faceSize - halfCubeSize + halfFaceSize,
-                                         halfCubeSize - halfFaceSize,
-                                         row * faceSize - halfCubeSize + halfFaceSize);
-                    rotation = glm::vec3(90.0f, 0.0f, 0.0f);
-                    color = glm::vec3(1.0f, 0.5f, 0.0f); // Orange
-                    break;
-                case 5: // Bottom
-                    position = glm::vec3(col * faceSize - halfCubeSize + halfFaceSize,
-                                         -halfCubeSize + halfFaceSize,
-                                         -row * faceSize + halfCubeSize - halfFaceSize);
-                    rotation = glm::vec3(-90.0f, 0.0f, 0.0f);
-                    color = glm::vec3(1.0f, 1.0f, 1.0f); // White
-                    break;
-                }
-
-                repository.addRegularPolygon(4, halfFaceSize, position, rotation, color);
-            }
+            position = glm::vec3(2 * j * cubeSize - sideOffset, 2 * i * cubeSize - sideOffset, .0f);
+            addRegularPolygon(4, cubeSize * sqrt(2), position, glm::vec3(0.0f, 0.0f, 45.0f), colors[(i + j) % 2]);
+            position = glm::vec3(2 * j * cubeSize - sideOffset, 2 * i * cubeSize - sideOffset, -6 * cubeSize);
+            addRegularPolygon(4, cubeSize * sqrt(2), position, glm::vec3(0.0f, 0.0f, 45.0f), colors[2 +(i + j) % 2]);
+            position = glm::vec3(3 * cubeSize, 2 * i * cubeSize - sideOffset, 2 * j * cubeSize - sideOffset - 3 * cubeSize);
+            addRegularPolygon(4, cubeSize * sqrt(2), position, glm::vec3(0.0f, 90.0f, 45.0f), colors[4 + (i + j) % 2]);
+            position = glm::vec3(-3 * cubeSize, 2 * i * cubeSize - sideOffset, 2 * j * cubeSize - sideOffset - 3 * cubeSize);
+            addRegularPolygon(4, cubeSize * sqrt(2), position, glm::vec3(0.0f, 90.0f, 45.0f), colors[6 + (i + j) % 2]);
+            position = glm::vec3(2 * i * cubeSize - sideOffset, -3 * cubeSize, 2 * j * cubeSize - sideOffset - 3 * cubeSize);
+            addRegularPolygon(4, cubeSize * sqrt(2), position, glm::vec3(90.0f, 0.0f, 45.0f), colors[8 + (i + j) % 2]);
+            position = glm::vec3(2 * i * cubeSize - sideOffset, 3 * cubeSize, 2 * j * cubeSize - sideOffset - 3 * cubeSize);
+            addRegularPolygon(4, cubeSize * sqrt(2), position, glm::vec3(90.0f, 0.0f, 45.0f), colors[10 + (i + j) % 2]);
         }
     }
 }
